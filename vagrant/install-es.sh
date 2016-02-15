@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export VAGRANT_MNT="/home/vagrant/sync"
+export VAGRANT_MNT="/vagrant"
 
 echo "OO install elasticsearch"
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch

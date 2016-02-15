@@ -3,7 +3,7 @@
 now=$(date +"%T")
 echo "Starting at : $now"
 
-export VAGRANT_MNT="/home/vagrant/sync"
+export VAGRANT_MNT="/vagrant"
 
 echo '127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 search api antenna opsmq daq opsdb sysdb kloopzappdb kloopzcmsdb cmsapi sensor activitidb kloopzmq searchmq' > /etc/hosts
 echo '::1         localhost localhost.localdomain localhost6 localhost6.localdomain6' >> /etc/hosts
