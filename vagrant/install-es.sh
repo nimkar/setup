@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export VAGRANT_MNT="/vagrant"
+export VAGRANT_MNT="/home/vagrant/sync"
 
 echo "OO install elasticsearch"
 rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
@@ -16,10 +16,13 @@ yum -y install elasticsearch
 export ES_HEAP_SIZE=512m
 echo "export ES_HEAP_SIZE=512m" > /etc/profile.d/es.sh
 sed -i -- 's/\#cluster\.name\: elasticsearch/cluster\.name\: oneops/g' /etc/elasticsearch/elasticsearch.yml
-chkconfig --add elasticsearch
-chkconfig elasticsearch on
 
-service elasticsearch start
+#chkconfig --add elasticsearch
+#chkconfig elasticsearch on
+#service elasticsearch start
+
+systemctl enable elasticsearch
+systemctl start elasticsearch
 
 cp "$VAGRANT_MNT/search-consumer/init.d/search-consumer" /etc/init.d
 chkconfig --add search-consumer
@@ -39,6 +42,3 @@ curl -d @/tmp/cms_template.json -X PUT http://localhost:9200/_template/cms_templ
 curl -d @/tmp/event_template.json -X PUT http://localhost:9200/_template/event_template
 
 echo "OO done with elasticsearch"
-
-
-

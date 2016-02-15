@@ -3,19 +3,19 @@
 now=$(date +"%T")
 echo "Starting at : $now"
 
-export VAGRANT_MNT="/vagrant"
+export VAGRANT_MNT="/home/vagrant/sync"
 
 echo '127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 search api antenna opsmq daq opsdb sysdb kloopzappdb kloopzcmsdb cmsapi sensor activitidb kloopzmq searchmq' > /etc/hosts
 echo '::1         localhost localhost.localdomain localhost6 localhost6.localdomain6' >> /etc/hosts
 
-# java 
+# java
 echo "OO installing open jdk 1.8"
 yum -y install java-1.8.0-openjdk-devel
 
 # misc
-yum -y install vim-common ntp perl-Digest-SHA
-chkconfig ntpd on
-service ntpd start
+yum -y install git wget vim-common ntp perl-Digest-SHA
+systemctl enable ntpd
+systemctl start ntpd
 
 # postgres
 echo "OO install postgres 9.2"
@@ -23,9 +23,9 @@ yum -y install http://yum.postgresql.org/9.2/redhat/rhel-6-x86_64/pgdg-centos92-
 yum -y install postgresql92-server postgresql92-contrib
 yum -y install postgresql-devel
 
-service postgresql-9.2 initdb
-chkconfig --add postgresql-9.2
-chkconfig postgresql-9.2 on
+echo "OO init postgres database"
+rm -fr /var/lib/pgsql/9.2/data/*
+/usr/pgsql-9.2/bin/postgresql92-setup initdb
 
 echo "OO changing postgres config to allow local connections"
 
@@ -33,7 +33,8 @@ cp "$VAGRANT_MNT/pgsql/9.2/pg_hba.conf" /var/lib/pgsql/9.2/data
 chown postgres:postgres /var/lib/pgsql/9.2/data/pg_hba.conf
 
 echo "OO starting postgres db"
-service postgresql-9.2 start
+systemctl enable postgresql-9.2
+systemctl start postgresql-9.2
 echo "OO done with postgres"
 
 apache_mirror="http://www.us.apache.org/dist"
@@ -45,25 +46,25 @@ cd /opt
 wget -nv $apache_mirror/activemq/$amq_version/apache-activemq-$amq_version-bin.tar.gz
 if [ ! -e "/opt/apache-activemq-$amq_version-bin.tar.gz" ]; then
   wget -nv $apache_archive/activemq/$amq_version/apache-activemq-$amq_version-bin.tar.gz
-fi   
+fi
 
 if [ ! -e "/opt/apache-activemq-$amq_version-bin.tar.gz" ]; then
   echo "Can not get Activemq distribution! "
   exit 1
 fi
 
-tar -xzvf apache-activemq-$amq_version-bin.tar.gz 
+tar -xzvf apache-activemq-$amq_version-bin.tar.gz
 ln -sf ./apache-activemq-$amq_version activemq
 cp "$VAGRANT_MNT/amq/5.10/init.d/activemq" /etc/init.d
 cp "$VAGRANT_MNT/amq/credentials.properties" /opt/activemq/conf/
 chown root:root /etc/init.d/activemq
 chmod +x /etc/init.d/activemq
 chkconfig --add activemq
-chkconfig activemq on 
+chkconfig activemq on
 service activemq start
 echo "OO done with activemq"
 
-c_version="2.1.12"
+c_version="2.1.13"
 echo "OO install cassandra $c_version"
 cd /opt
 wget -nv $apache_mirror/cassandra/$c_version/apache-cassandra-$c_version-bin.tar.gz
@@ -97,13 +98,13 @@ if [ ! -e "/opt/apache-tomcat-$t_version.tar.gz" ]; then
   echo "Can not get Tomcat distribution! "
   exit 1
 fi
-tar -xzvf apache-tomcat-$t_version.tar.gz 
+tar -xzvf apache-tomcat-$t_version.tar.gz
 mv apache-tomcat-$t_version /usr/local/tomcat7
-useradd -M -d /usr/local/tomcat7 tomcat7 
+useradd -M -d /usr/local/tomcat7 tomcat7
 chown -R tomcat7 /usr/local/tomcat7
 cp "$VAGRANT_MNT/tomcat/7.0/init.d/tomcat7" /etc/init.d
 chown root:root /etc/init.d/tomcat7
-chmod 755 /etc/init.d/tomcat7 
+chmod 755 /etc/init.d/tomcat7
 chkconfig --add tomcat7
 chkconfig tomcat7 on
 service tomcat7 start
@@ -123,22 +124,10 @@ fi
 tar -xzvf apache-maven-$m_version-bin.tar.gz -C /usr/local
 cd /usr/local
 ln -sf apache-maven-$m_version maven
-touch /etc/profile.d/maven.sh 
-echo 'export M2_HOME=/usr/local/maven' >> /etc/profile.d/maven.sh 
+touch /etc/profile.d/maven.sh
+echo 'export M2_HOME=/usr/local/maven' >> /etc/profile.d/maven.sh
 echo 'export PATH=${M2_HOME}/bin:${PATH}' >> /etc/profile.d/maven.sh
 echo "OO done with maven"
-
-echo "OO install git"
-yum -y install git
-#this is for gecgit only
-mkdir -p /root/.ssh
-cp "$VAGRANT_MNT/git_ssh/config" /root/.ssh
-chown root:root /root/.ssh/config
-chmod 600 /root/.ssh/config
-cp "$VAGRANT_MNT/git_ssh/git_rsa" /root/.ssh
-chown root:root /root/.ssh/git_rsa
-chmod 600 /root/.ssh/git_rsa
-echo "OO done with git"
 
 echo "OO generate des file"
 mkdir -p /usr/local/oneops/certs
@@ -149,4 +138,3 @@ dd if=/dev/urandom count=24 bs=1 | xxd -ps > oo.key
 truncate -s -1 oo.key
 fi
 echo "OO Done with des file"
-
