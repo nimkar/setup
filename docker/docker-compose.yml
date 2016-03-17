@@ -6,13 +6,11 @@ services:
     container_name: inductor
     build: inductor
     volumes:
-      - home:/home/oneops
+      - oneops_home:/home/oneops
       - opt:/opt/oneops
-    links:
-      - rails
-      - tomcat:api
-      - tomcat:cmsapi
-      - activemq
+    networks:
+      - central
+      
 
   rails:
     container_name: rails
@@ -20,42 +18,30 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - home:/home/oneops
+      - oneops_home:/home/oneops
       - opt:/opt/oneops
-    links:
-      - postgres:kloopzappdb
-      - tomcat:api
-      - tomcat:cmsapi
-      - tomcat:antenna
-      - tomcat:sensor
-
+    networks:
+      - central
+      
   tomcat:
     container_name: tomcat
     build: tomcat
     ports:
       - "8080:8080"
     volumes:
-      - home:/home/oneops
-    links:
-      - postgres:kloopzcmsdb
-      - postgres:activitidb
-      - activemq:amq
-      - activemq:kloopzmq
-      - activemq:searchmq
-      - activemq:opsmq
-      - cassandra:daq
-      - cassandra:opsdb
-      - cassandra:sysdb
-
+      - oneops_home:/home/oneops
+    networks:
+      - central
+      
   logstash:
     container_name: logstash
     build: logstash
     ports:
       - "5000"
     volumes:
-      - home:/home/oneops
-    links:
-      - elasticsearch
+      - oneops_home:/home/oneops
+    networks:
+      - central
 
   postgres:
     container_name: postgres
@@ -63,7 +49,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - home:/home/oneops
+      - oneops_home:/home/oneops
       - postgres:/var/lib/pgsql/9.2/data
 
   activemq:
@@ -72,7 +58,7 @@ services:
     ports:
       - "61617:61617"
     volumes:
-      - home:/home/oneops
+      - oneops_home:/home/oneops
       - activemq:/kahadb
 
   cassandra:
@@ -82,7 +68,7 @@ services:
       - "7000:7000"
       - "9160:9160"
     volumes:
-      - home:/home/oneops
+      - oneops_home:/home/oneops
       - cassandra:/opt/cassandra/data
     cap_add:
       - IPC_LOCK
@@ -98,22 +84,13 @@ services:
       - "9200:9200"
       - "9300:9300"
     volumes:
-      - home:/home/oneops
+      - oneops_home:/home/oneops
       - elasticsearch:/var/lib/elasticsearch
-
-  jenkins:
-    container_name: jenkins
-    build: jenkins
-    ports:
-     - "3001:3001"
-    volumes:
-     - home:/home/oneops
 
 volumes:
 
-  home:
-    external: false
-    driver: local
+  oneops_home:
+    external: true
 
   opt:
     external: false
@@ -134,3 +111,7 @@ volumes:
   elasticsearch:
     external: false
     driver: local
+
+networks:
+  central:
+    driver: bridge
