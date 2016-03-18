@@ -9,7 +9,7 @@ services:
       - oneops_home:/home/oneops
       - opt:/opt/oneops
     networks:
-      - central
+      central:
       
 
   rails:
@@ -21,7 +21,7 @@ services:
       - oneops_home:/home/oneops
       - opt:/opt/oneops
     networks:
-      - central
+      central:
       
   tomcat:
     container_name: tomcat
@@ -31,7 +31,12 @@ services:
     volumes:
       - oneops_home:/home/oneops
     networks:
-      - central
+      central:
+        aliases:
+          - api
+          - cmsapi
+          - antenna
+          - sensor
       
   logstash:
     container_name: logstash
@@ -41,7 +46,7 @@ services:
     volumes:
       - oneops_home:/home/oneops
     networks:
-      - central
+      central:
 
   postgres:
     container_name: postgres
@@ -51,6 +56,12 @@ services:
     volumes:
       - oneops_home:/home/oneops
       - postgres:/var/lib/pgsql/9.2/data
+    networks:
+      central:
+        aliases:
+          - kloopzappdb
+          - kloopzcmsdb
+          - activitidb
 
   activemq:
     container_name: activemq
@@ -60,7 +71,13 @@ services:
     volumes:
       - oneops_home:/home/oneops
       - activemq:/kahadb
-
+    networks:
+      central:
+        aliases:
+          - kloopzmq
+          - searchmq
+          - opsmq
+          
   cassandra:
     container_name: cassandra
     build: cassandra
@@ -76,6 +93,12 @@ services:
       memlock:
         soft: -1
         hard: -1
+    networks:
+      central:
+        aliases:
+           - daq
+           - opsdb
+           - sysdb
 
   elasticsearch:
     container_name: elasticsearch
