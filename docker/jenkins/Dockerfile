@@ -26,3 +26,4 @@ COPY build.sh build.sh
 RUN chmod +x build.sh
 RUN ln -s /home/oneops/build/build.sh /usr/bin/build
 RUN mkdir -p ${OO_HOME}/dist
+ENTRYPOINT ["/usr/bin/build"]
