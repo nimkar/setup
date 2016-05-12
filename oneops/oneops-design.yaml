@@ -48,19 +48,6 @@
         rails-env: production
         processes: '16'
         dbpass: $OO_GLOBAL{password}
-        ASSET-URL: https://dfw-001-object-ocs.prod.walmart.com/v1/AUTH_16f78a1447394ba09679cb3471bf4f37/$OO_GLOBAL{env_name}/
-        SESSION-INACTIVITY-TIMEOUT: '30'
-        HELP-URL: https://confluence.walmart.com/x/EfwnAQ
-        REPORT-PROBLEM-URL: https://jira.walmart.com/secure/CreateIssue.jspa?pid=10132&issuetype=10
-        SUPPORT-AUTH: oneops
-        SUPPORT-CHAT-URL: https://walmartlabs.slack.com/messages/oneops/
-        LOG-DATA-SOURCE: es
-        TERMS-OF-SERVICE-URL: http://www.oneops.com/legal/terms
-        NEWS-URL: https://confluence.walmart.com/x/-hgF
-        log-site: http://eslogs.core.oneops.mgmt.walmart.com:9200/
-        SUPPORT-EMAIL: support@oneops.com
-        PRIVACY-POLICY-URL: http://corporate.walmart.com/privacy-security/walmart-privacy-policy
-        FEEDBACK-URL: https://jira.walmart.com/secure/CreateIssue.jspa?pid=10132
       links:
         - displaydb
       components:
@@ -202,26 +189,6 @@
               RailsEnv enterprise
               PassengerMinInstances $OO_LOCAL{processes}
               PassengerMaxPoolSize $OO_LOCAL{processes}
-              SetEnv IDENTITY "$OO_GLOBAL{ENV-IDENTITY}"
-              SetEnv OO_HOSTNAME web.$OO_GLOBAL{ENV-IDENTITY}.oneops.walmart.com
-              SetEnv SMTP_HOSTNAME $OO_CLOUD{smtp}
-              SetEnv SENSOR_HEALTH_PATH "components/states"
-              SetEnv POLICY_MANAGEMENT "true"
-              SetEnv CHECK_POLICY_COMPLIANCE "true"
-              SetEnv OODB_USERNAME "display"
-              SetEnv OODB_PASSWORD "$OO_LOCAL{dbpass}"
-              SetEnv LOG_DATA_SOURCE "$OO_LOCAL{LOG-DATA-SOURCE}"
-              SetEnv ASSET_URL "$OO_LOCAL{ASSET-URL}"
-              SetEnv SESSION_INACTIVITY_TIMEOUT  "$OO_LOCAL{SESSION-INACTIVITY-TIMEOUT}"
-              SetEnv NEWS_URL "$OO_LOCAL{NEWS-URL}"
-              SetEnv HELP_URL "$OO_LOCAL{HELP-URL}"
-              SetEnv FEEDBACK_URL "$OO_LOCAL{FEEDBACK-URL}"
-              SetEnv REPORT_PROBLEM_URL "$OO_LOCAL{REPORT-PROBLEM-URL}"
-              SetEnv SUPPORT_CHAT_URL "$OO_LOCAL{SUPPORT-CHAT-URL}"
-              SetEnv TERMS_OF_SERVICE_URL "$OO_LOCAL{TERMS-OF-SERVICE-URL}"
-              SetEnv PRIVACY_POLICY_URL "$OO_LOCAL{PRIVACY-POLICY-URL}"
-              SetEnv SUPPORT_AUTH "$OO_LOCAL{SUPPORT-AUTH}"
-              SetEnv SUPPORT_EMAIL "$OO_LOCAL{SUPPORT-EMAIL}"
               <Directory /usr/local/oneops/display/public>
                 Allow from all
                 Options -MultiViews
