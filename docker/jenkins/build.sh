@@ -51,7 +51,7 @@ sleep 5
 
 ref="$1"
 if [[ -z  $ref ]]; then
-  ref=stable
+  ref=master
 fi
 
 echo "submit build $ref"
