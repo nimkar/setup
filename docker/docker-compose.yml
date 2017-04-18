@@ -1,0 +1,144 @@
+version: '2'
+
+services:
+
+  inductor:
+    container_name: inductor
+    build: inductor
+    volumes:
+      - oneops_home:/home/oneops
+      - opt:/opt/oneops
+    networks:
+      central:
+        aliases:
+          - logstash
+
+
+  rails:
+    container_name: rails
+    build: rails
+    ports:
+      - "3000:3000"
+    volumes:
+      - oneops_home:/home/oneops
+      - opt:/opt/oneops
+    networks:
+      central:
+
+  tomcat:
+    container_name: tomcat
+    build: tomcat
+    ports:
+      - "8080:8080"
+    volumes:
+      - oneops_home:/home/oneops
+    networks:
+      central:
+        aliases:
+          - api
+          - cmsapi
+          - antenna
+          - sensor
+
+  logstash:
+    container_name: logstash
+    build: logstash
+    ports:
+      - "5000"
+    volumes:
+      - oneops_home:/home/oneops
+    networks:
+      central:
+
+  postgres:
+    container_name: postgres
+    build: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - oneops_home:/home/oneops
+      - postgres:/var/lib/pgsql/9.2/data
+    networks:
+      central:
+        aliases:
+          - kloopzappdb
+          - kloopzcmsdb
+          - activitidb
+
+  activemq:
+    container_name: activemq
+    build: activemq
+    ports:
+      - "61617:61617"
+    volumes:
+      - oneops_home:/home/oneops
+      - activemq:/kahadb
+    networks:
+      central:
+        aliases:
+          - kloopzmq
+          - searchmq
+          - opsmq
+
+  cassandra:
+    container_name: cassandra
+    build: cassandra
+    ports:
+      - "7000:7000"
+      - "9160:9160"
+    volumes:
+      - oneops_home:/home/oneops
+      - cassandra:/opt/cassandra/data
+    cap_add:
+      - IPC_LOCK
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      central:
+        aliases:
+           - daq
+           - opsdb
+           - sysdb
+
+  elasticsearch:
+    container_name: elasticsearch
+    build: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - oneops_home:/home/oneops
+      - elasticsearch:/var/lib/elasticsearch
+    networks:
+      central:
+
+volumes:
+
+  oneops_home:
+    external: true
+
+  opt:
+    external: false
+    driver: local
+
+  postgres:
+    external: false
+    driver: local
+
+  activemq:
+    external: false
+    driver: local
+
+  cassandra:
+    external: false
+    driver: local
+
+  elasticsearch:
+    external: false
+    driver: local
+
+networks:
+  central:
+    driver: bridge

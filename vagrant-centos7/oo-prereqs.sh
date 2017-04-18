@@ -8,6 +8,9 @@ export VAGRANT_MNT="/vagrant"
 echo '127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 search api antenna opsmq daq opsdb sysdb kloopzappdb kloopzcmsdb cmsapi sensor activitidb kloopzmq searchmq' > /etc/hosts
 echo '::1         localhost localhost.localdomain localhost6 localhost6.localdomain6' >> /etc/hosts
 
+# disable ruby doc, this would speed up the install while a bit
+echo 'gem: --no-document' >> ~/.gemrc
+
 # java
 echo "OO installing open jdk 1.8"
 yum -y install java-1.8.0-openjdk-devel
@@ -142,22 +145,24 @@ echo "OO Done with des file"
 
 # misc packages
 yum install -y gcc gcc-c++ ruby-devel zlib-devel nc bind-utils
-yum -y install libxml2-devel libxslt-devel
-yum -y install graphviz
+
+# gem build deps
+yum -y install libxml2-devel libxslt-devel graphviz
 
 #
 # ruby
 #
 
 yum -y install rubygems ruby-devel
+gem update --system 2.6.1
+gem install json -v 1.8.3
+gem install bundler
 gem install rake
 gem install net-ssh -v 2.9.1
-gem install bundler
 gem install mixlib-log -v '1.6.0'
-gem install rails
+echo "export PATH=$PATH:/usr/local/bin" > /etc/profile.d/gem_bin.sh
 
 cp "$VAGRANT_MNT/display/init.d/display" /etc/init.d
-
 chkconfig --add display
 chkconfig display on
 
